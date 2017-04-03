@@ -24,6 +24,7 @@ public class Classifier {
 		System.out.println("svm classify " + modelName + " " + testData+"...");
 		String path = "/Users/sunghee/Documents/sunghee-data/2016programs/svm_multiclass/";
 		String command = path + "svm_multiclass_classify " + path + testData +" " + path + modelName + " " + path + pred ;
+		System.out.println(command);
 		executeSystemCommand(command);
 	}
 	
@@ -56,7 +57,7 @@ public class Classifier {
 	            System.out.println(s);
 	        }
 	        
-	        System.exit(0);
+//	        System.exit(0);
 	    }
 	    catch (IOException e) {
 	        System.out.println("exception happened - here's what I know: ");

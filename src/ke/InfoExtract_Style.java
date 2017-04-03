@@ -15,7 +15,7 @@ public class InfoExtract_Style extends InfoExtract {
 	// Do InfoExtract_Style with input types RefSet_Style and HashMap with names and models 
 	public static void InfoExtract_Style(RefSet_Style aRefSet_Style,	HashMap<String, CRFmodel> aCRFmodel) {
 
-		InfoExtract.InfoExtract(aRefSet_Style, aCRFmodel.get(aRefSet_Style.style));
+		InfoExtract(aRefSet_Style, aCRFmodel.get(aRefSet_Style.style));
 
 	}
 
@@ -26,28 +26,38 @@ public class InfoExtract_Style extends InfoExtract {
 		String modelName = "example4/model"; // 분류 모델
 		Ref aRef = new Ref();
 		// ConnectionAlgoDB.
-		// 선결조건이 필요하다. 무엇을 위한 선결조건은 무엇인가? 아래 코드 부분는 설결조건을 표현한 것인데 그 선결조건을 그래프로 만들어야 하나? 그렇다.
-		// 만든 그래프, 즉, 선결조건으로부터 traverse하면서 아래 코드를 만들어야 한다. 아래 코드를 자동으로 생성하는 데에 필요한 키워드들은 그래프에서 명시되든지
+		// 선결조건이 필요하다. 무엇을 위한 선결조건인가? 아래 코드 부분는 한 선결조건을 표현한 것이다. 현재 그 선결조건은 OOP형태로 기술되어 있다. 
+		// 그 선결조건을 RDF 그래프로 만들어야 하는가? 그렇다. 
+		// 왜 그래프로 만들어야 하는가?  만든 그래프, 즉, 선결조건으로부터 traverse하면서 아래 코드를 만들어야 한다. 
+		// 아래 코드를 자동으로 생성하는 데에 필요한 키워드들은 그래프에서 명시되든지
 		// 혹은 지식베이스로부터 가져와야 한다.
 		// 아래 코드는 svm 에 대한 실예(instance)이다.
 		// svm_multiclass_learn -c 5000 example4/train.dat example4/model
-		// svm_multiclass_classify example4/test.dat example4/model
-		// example4/predictions
+		// svm_multiclass_classify example4/test.dat example4/model example4/predictions
 
-		// 여기서, 명령어 자체, 그리고, 옵션들의 값은 어디서 자동으로 생설할 수 있을까?
+		// 여기서, 명령어 자체, 그리고, 옵션들의 값은 어디서 자동으로 생설할 수 있을까? 또한, OOP에서 RDF 그래프 지식을 가져와서 처리(진행)할 수 있을까?
+		
 		// classifier_by_style은 무엇인가? 왜 필요한가? modelName과 같은 것 아닌가? modelName은
 		// 1) 모델자체일 수도 있고 2) 모델을 지칭하는 이름일 수도 있지만, 3) 여기서는 모델이 위치한 경로일 수 있다. 모델의 이름과 경로는 어떻게 다른가?
 		// 경로와 이름은 같은 목적으로 사용되는 식별자이다. 즉, 그 목적은 구분을 위한 것이다. URL와 URN의 차이라고 할 수 있다. 
 		// 이들 모두 URI와도 같은 의미를 지닐 것이다. 
+		// Relational Database관점에서 보면 
 		// 1) 모델자체이면 DB에 blob형태로 저장되어 있어야 하고, 2) 모델을 지칭하는 이름이라면 그 이름을 통해서 그 모델이 어디 있는지 다시 찾아야 하는 번거로움이 있고
 		// 3) 만약 모델이 위치한 경로라면 server 내의 파일
 		// URL일 것이다.
+		
+		/*
+		 * Reference style classification
+		 */
+		
 		if (InfoExtract_Style.classifier_by_style==null) {
 			; // learn을 할지 말지 결정하기 위한 조건은 style에 따라 분류할 model이 준비되어 있느냐 없느냐이다.
 				// 만약 없다면 learn해서 그 모델을 만들고, 있다면 그 model을 가지고 입력자료를 분류한다. (사실 이 부분은 새로운 문제이다. 즉,
 			// 입력이 있어서 결과로 새로운 모델을 만들어야 하는 문제인 것이다.
 		// 따라서, 그 모델은 learn에서의 모델이다.
 		// 여기서 분류나 learn은 실제로 문제를 푸는 것이고, 구조적인(틀에 해당하는) 부분은 또 따로 그래프를 형성해야 한다.
+		InfoExtract_Style.classifier_by_style = modelName;
+
 		Classifier.learn(trainData, InfoExtract_Style.classifier_by_style); // 지식베이스로부터
 																			// 가져온다.
 																			// svm_multiclass_learn
@@ -60,7 +70,12 @@ public class InfoExtract_Style extends InfoExtract {
 		// 그렇지 않고 경로라면 trainData가 정의된 파일 URL일 것이다. 이것은 어떻게 알 수 있나?
 		// modelName은 어떤 식으로 처리할 지 고민해야 한다. 즉, 없었다가 만들어지기 때문에 서버나 로컬에
 		// 만든 후에는 1) 만든 곳의 URL이나 혹은 2)그 자체로 blob형태로 DB에 저장해야 한다.
-		Classifier.classify(aRef.text, InfoExtract_Style.classifier_by_style, aRef.refValue); // 지식베이스로부터
+		String testData = "example4/test.dat";
+		String predData = "example4/predictions";
+		
+	
+		Classifier.classify(testData, InfoExtract_Style.classifier_by_style, predData); // 지식베이스로부터		
+//		Classifier.classify(aRef.text, InfoExtract_Style.classifier_by_style, aRef.refValue); // 지식베이스로부터
 																			// 가져온다.
 																			// classify한
 																			// 다음에는
@@ -68,11 +83,16 @@ public class InfoExtract_Style extends InfoExtract {
 																			// style이
 																			// 결정된다.
 
+		
+		/*
+		 *  Sequence labeling by style_tagger
+		 */
 		RefSet_Style aRefSet_Style1 = new RefSet_Style();
 
 		HashMap<String, CRFmodel> aCRFmodelMap = new HashMap<String, CRFmodel>();
 		aCRFmodelMap.put("IEEE", new CRFmodel("IEEEmodel"));
 
+		
 		InfoExtract_Style aThisClass = new InfoExtract_Style();
 		aThisClass.InfoExtract_Style(aRefSet_Style1, aCRFmodelMap);
 	}
